@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm"
 	"web_server_gin/config"
@@ -12,7 +13,10 @@ func main() {
 	engine := gin.Default()
 	engine.Any("/", controller.HelloController)
 	conf := config.InitConfig()
-	v1.RouterGroup(conf.DBConn, engine)
 
-	engine.Run(":80")
+	if err := v1.RouterGroup(conf.DBConn, engine); err != nil {
+		panic(err)
+	}
+
+	engine.Run(fmt.Sprintf("%s:%d", conf.ServerIP, conf.ServerPort))
 }
