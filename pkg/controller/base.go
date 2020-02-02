@@ -11,5 +11,5 @@ type ServerHandle struct {
 }
 
 func HelloController(ctx *gin.Context) {
-	ctx.String(http.StatusOK, "hello, I am qiuwenqi.")
+	ctx.HTML(http.StatusOK, "index.html", "hello, I am qiuwenqi.")
 }
