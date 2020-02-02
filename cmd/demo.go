@@ -34,7 +34,7 @@ func HTMLController(router *gin.Engine) (err error) {
 
 func main() {
 	engine := gin.Default()
-	engine.StaticFS("/static", http.Dir("/Users/rainmc/GO/src/web_server_gin/html/static"))
+	engine.StaticFS("/static", http.Dir("./html/static"))
 	// engine.StaticFS("/*.html", http.Dir("/Users/rainmc/GO/src/web_server_gin/html/html"))
 	engine.LoadHTMLGlob("html/html/*")
 	engine.Any("/", controller.HelloController)
