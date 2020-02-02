@@ -21,6 +21,8 @@ func (sh *ServerHandle) ListResourcesController(ctx *gin.Context) {
 	glog.Infof("query filters :%+v", filters)
 
 	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	// num = int64(len(posts))
+	glog.Infof("query result num:%d, %+v.", num, posts)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
 		return

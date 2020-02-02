@@ -184,6 +184,8 @@ func (db *DB) FilterTable(filters map[string][]string, modelList interface{}, ta
 
 	}
 
+	qs.Find(modelList).Count(&num)
+
 	if len(filters) != 0 {
 		err = qs.
 			Limit(limit).
@@ -201,15 +203,18 @@ func (db *DB) FilterTable(filters map[string][]string, modelList interface{}, ta
 			Error
 	}
 
+	// num = int64(len(modelList))
+	// totalCount := num
+	// if limit != 1000 || offset != 0 {
+	// 	qs.Count(&totalCount)
+	// }
 	totalCount := num
-	if limit != 1000 || offset != 0 {
-		qs.Count(&totalCount)
-	}
-	glog.Infof("List %s list,%d,%d,%s,filters: %+v, num: %d,count: %d.",
-		tableName, limit, offset, orderValue, filters, num, totalCount)
+
+	glog.Infof("List %s list,%d,%d,%s,filters: %+v, num: %d,count: %d, %+v.",
+		tableName, limit, offset, orderValue, filters, num, totalCount, modelList)
 
 	if err != nil {
 		return 0, fmt.Errorf("query db error, please check parameters, detail: %s", err.Error())
 	}
-	return totalCount, err
+	return num, err
 }
