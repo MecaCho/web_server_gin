@@ -1,22 +1,21 @@
 package dao
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/golang/glog"
 	"github.com/jinzhu/gorm"
 	"strconv"
 )
 
-// InitDB init db connection
-func InitDB(conn string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", conn)
-
-	if err != nil {
-		glog.Errorf("Init DB error, %s", err.Error())
-	}
-	return db, err
-}
+// // InitDB init db connection
+// func InitDB(conn string) (*sql.DB, error) {
+// 	db, err := sql.Open("postgres", conn)
+//
+// 	if err != nil {
+// 		glog.Errorf("Init DB error, %s", err.Error())
+// 	}
+// 	return db, err
+// }
 
 // DB db handle
 type DB struct {

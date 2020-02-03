@@ -1,3 +1,4 @@
+{{ define "index.html" }}
 <!DOCTYPE html>
 <html>
 <head>
@@ -89,7 +90,7 @@
                 <article class="post post-2">
                     <header class="entry-header">
                         <h1 class="entry-title">
-                            <a href="single.html">《经济学卷一读后感》：什么是经济学</a>
+                            <a href="single.html">《薛兆丰经济学讲义》读后感：什么是经济学</a>
                         </h1>
                         <div class="entry-meta">
                             <span class="post-category"><a href="#">教育学</a></span>
@@ -107,6 +108,31 @@
                         </div>
                     </div>
                 </article>
+
+                {{range .data}}
+                    <article class="post post-{{.ID}}">
+                        <header class="entry-header">
+                            <h1 class="entry-title">
+                                <a href="single.html">{{.Title}}</a>
+                            </h1>
+                            <div class="entry-meta">
+                                <span class="post-category"><a href="#">{{.Category}}</a></span>
+                                <span class="post-date"><a href="#"><time class="entry-date"
+                                                                          datetime="2020-02-02T23:15:57+00:00">{{.CreatedAt}}</time></a></span>
+                                <span class="post-author"><a href="#">{{.Author}}</a></span>
+                                <span class="comments-link"><a href="#">{{.Comment}} 评论</a></span>
+                                <span class="views-count"><a href="#">{{.Read}} 阅读</a></span>
+                            </div>
+                        </header>
+                        <div class="entry-content clearfix">
+                            {{/*<p>{{.title}}, {{.content}}, {{.comment}}, {{.author}}, {{.read}}, {{.category}} {{.created_at}} {{.id}}*/}}
+                            <p>{{.Content}}</p>
+                            <div class="read-more cl-effect-14">
+                                <a href="#" class="more-link">继续阅读 <span class="meta-nav">→</span></a>
+                            </div>
+                        </div>
+                    </article>
+                        {{end}}
 
                 <!-- 简单分页效果
                 <div class="pagination-simple">
@@ -215,3 +241,4 @@
 
 </body>
 </html>
+{{ end }}

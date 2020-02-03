@@ -7,7 +7,7 @@ import (
 )
 
 type ServerHandle struct {
-	ORM dao.DB
+	ORM *dao.DB
 }
 
 func HelloController(ctx *gin.Context) {

@@ -2,21 +2,13 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"web_server_gin/pkg/controller"
 	"web_server_gin/pkg/dao"
-	"web_server_gin/pkg/model"
 )
 
-func RouterGroup(dbCon string, router *gin.Engine) (err error) {
+func RouterGroup(dbORM *dao.DB, router *gin.Engine) (err error) {
 
-	db, err := gorm.Open("mysql", dbCon)
-	if err != nil {
-		return
-	}
-	db.AutoMigrate(&model.Post{})
-	dbORM := dao.DB{*db, true}
 	server := controller.ServerHandle{dbORM}
 
 	// router := gin.Default()
