@@ -36,7 +36,7 @@ func (sh *ServerHandle) GetResourceController(ctx *gin.Context) {
 	var post model.Post
 	filters := map[string][]string{}
 
-	id, ok := ctx.Params.Get("id")
+	id, ok := ctx.Params.Get("post_id")
 	if !ok {
 		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, "resource not found"))
 		return

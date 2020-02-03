@@ -161,6 +161,7 @@ func (db *DB) FilterTable(filters map[string][]string, modelList interface{}, ta
 
 	qs := db.ORM
 
+	filterMap := make(map[string]interface{})
 	for k, v := range filters {
 		if len(v) < 1 {
 			continue
@@ -180,15 +181,15 @@ func (db *DB) FilterTable(filters map[string][]string, modelList interface{}, ta
 			delete(filters, k)
 			continue
 		}
-
+		filterMap[k] = value
 	}
 
 	qs.Find(modelList).Count(&num)
 
-	if len(filters) != 0 {
+	if len(filterMap) != 0 {
 		err = qs.
 			Limit(limit).
-			Where(filters).
+			Where(filterMap).
 			Offset(offset).
 			Order(orderValue).
 			Find(modelList).

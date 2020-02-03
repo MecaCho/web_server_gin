@@ -24,9 +24,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 		v1.GET("about.html", func(context *gin.Context) {
 			context.HTML(http.StatusOK, "about.html", "hello, I am qiuwenqi.")
 		})
-		v1.GET("single.html", func(context *gin.Context) {
-			context.HTML(http.StatusOK, "single.html", "hello, I am qiuwenqi.")
-		})
+		v1.GET("/posts/:post_id", server.GetPostController)
 		v1.GET("full-width.html", func(context *gin.Context) {
 			context.HTML(http.StatusOK, "full-width.html", "hello, I am qiuwenqi.")
 		})
@@ -46,4 +44,30 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"data": posts,
 	})
+}
+
+// GetResourceController ...
+func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
+	var post model.Post
+	filters := map[string][]string{}
+
+	id, _ := ctx.Params.Get("post_id")
+	// if !ok {
+	// 	ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, "resource not found"))
+	// 	return
+	// }
+
+	filters["id"] = []string{id}
+	sh.ORM.FilterTable(filters, &post, dao.DBTableNamePost)
+	// if err != nil || num == 0 {
+	// 	ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, err.Error()))
+	// 	return
+	// }
+	var posts []model.Post
+	posts = append(posts, post)
+	ctx.HTML(http.StatusOK, "single.html", gin.H{
+		"posts": posts,
+	})
+
+	return
 }
