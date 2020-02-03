@@ -9,7 +9,7 @@ type BaseCommonModel struct {
 	ID          int64     `json:"id" gorm:"AUTO_INCREMENT;PRIMARY_KEY;unique;Column:id"`
 	Name        string    `json:"name" gorm:"size:64"`
 	Description string    `json:"description" gorm:"size:256;null"`
-	CreatedAt   time.Time `json:"created_at"`
+	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"null"`
 	Creator     string    `json:"creator" gorm:"size:32"`
 	Modifier    string    `json:"modifier" gorm:"size:32;null"`
