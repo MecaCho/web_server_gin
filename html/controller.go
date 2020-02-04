@@ -25,9 +25,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 			context.HTML(http.StatusOK, "about.html", "hello, I am qiuwenqi.")
 		})
 		v1.GET("/posts/:post_id", server.GetPostController)
-		v1.GET("full-width.html", func(context *gin.Context) {
-			context.HTML(http.StatusOK, "full-width.html", "hello, I am qiuwenqi.")
-		})
+		v1.GET("full-width.html", server.IndexController)
 	}
 	return
 }
