@@ -37,12 +37,12 @@ func Logger() gin.HandlerFunc {
 			latency,
 			status,
 		)
-		glog.Infof("Request remote addr: %s.", c.Request.RemoteAddr)
 	}
 }
 
 func main() {
 	engine := gin.Default()
+	// binding.Validator.RegisterValidation("timevalidate", common.TimeValidate)
 	engine.Use(Logger())
 	engine.StaticFS("/static", http.Dir("./html/static"))
 	engine.LoadHTMLGlob("html/html/*")

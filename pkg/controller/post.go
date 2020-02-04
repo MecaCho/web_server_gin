@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/golang/glog"
 	"net/http"
 	"web_server_gin/pkg/dao"
@@ -66,14 +67,21 @@ func (sh *ServerHandle) DeleteResourcesController(ctx *gin.Context) {
 func (sh *ServerHandle) CreateResourceController(ctx *gin.Context) {
 	var postCreate types.PostCreate
 	if err := ctx.ShouldBind(&postCreate); err != nil {
+		glog.Errorf("Validate binding request body error: %s.", err.Error())
 		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
 		return
 	}
-	err := sh.ORM.CreateResource(&postCreate.Post)
+	err := binding.Validator.ValidateStruct(postCreate.Post)
+	if err != nil {
+		glog.Errorf("Validate request body error: %s.", err.Error())
+		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
+		return
+	}
+	err = sh.ORM.CreateResource(&postCreate.Post)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, types.RenderPostResp(postCreate.Post))
+	ctx.JSON(http.StatusCreated, types.RenderPostResp(postCreate.Post))
 	return
 }
