@@ -8,6 +8,8 @@
 .idea
 demo
 vendor
+releases
+releases/*
 # Test binary, built with `go test -c`
 *.test
 
