@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/golang/glog"
 	_ "github.com/jinzhu/gorm"
 	"net/http"
 	"time"
 	"web_server_gin/config"
 	"web_server_gin/html"
+	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/router/v1"
 )
@@ -42,6 +44,8 @@ func Logger() gin.HandlerFunc {
 
 func main() {
 	engine := gin.Default()
+	binding.Validator = common.NewStructValidator
+	// binding.Validator.Engine() = binding.Validator.Engine()
 	// binding.Validator.RegisterValidation("timevalidate", common.TimeValidate)
 	engine.Use(Logger())
 	engine.StaticFS("/static", http.Dir("./html/static"))

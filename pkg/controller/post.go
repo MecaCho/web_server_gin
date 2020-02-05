@@ -65,7 +65,7 @@ func (sh *ServerHandle) DeleteResourcesController(ctx *gin.Context) {
 // CreateResourceController ...
 func (sh *ServerHandle) CreateResourceController(ctx *gin.Context) {
 	var postCreate types.PostCreate
-	if err := ctx.ShouldBind(&postCreate); err != nil {
+	if err := ctx.ShouldBind(&postCreate.Post); err != nil {
 		glog.Errorf("Validate binding request body error: %s.", err.Error())
 		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
 		return
