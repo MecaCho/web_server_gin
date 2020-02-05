@@ -27,6 +27,12 @@ func (v *defaultValidator) ValidateStruct(obj interface{}) error {
 		v.lazyinit()
 		if err := v.validate.Struct(obj); err != nil {
 			structType := GetTypeName(obj)
+			// validationErrors := err.(validator.ValidationErrors)
+			// // validationErrors.Translate("123")
+			// for _, e := range validationErrors {
+			// 	// can translate each error one at a time.
+			// 	fmt.Println(e.Translate(trans))
+			// }
 			glog.Errorf("Validate %s error: %s.", structType, err.Error())
 			return error(err)
 		}
