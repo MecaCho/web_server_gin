@@ -146,5 +146,7 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		"posts": postsResponse.Posts,
 	})
 
+	posts[0].Read += 1
+	sh.ORM.UpdatePost(posts[0])
 	return
 }

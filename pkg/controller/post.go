@@ -49,6 +49,7 @@ func (sh *ServerHandle) GetResourceController(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, types.RenderPostResp(posts[0]))
+	sh.ORM.UpdatePost(posts[0])
 	return
 }
 

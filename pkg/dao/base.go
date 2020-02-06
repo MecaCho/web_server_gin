@@ -125,7 +125,7 @@ func (db *DB) CreateResource(resourceDB interface{}) (err error) {
 }
 
 // UpdateResource update resource in db
-func (db *DB) UpdateResource(resourceDB interface{}, columns ...string) (err error) {
+func (db *DB) UpdateResource(resourceDB interface{}, tableName string, columns ...string) (err error) {
 	var id int64
 	defer func() {
 		if err != nil {
@@ -135,7 +135,10 @@ func (db *DB) UpdateResource(resourceDB interface{}, columns ...string) (err err
 		}
 	}()
 
-	err = db.ORM.Update(resourceDB).Error
+	err = db.ORM.Table(tableName).Updates(resourceDB).Error
+	if err != nil {
+		glog.Errorf("Update resource error: %s.", err.Error())
+	}
 	return
 }
 
