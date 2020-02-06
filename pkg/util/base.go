@@ -1,7 +1,10 @@
 package util
 
 import (
+	"fmt"
+	"github.com/golang/glog"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -16,4 +19,17 @@ func GenPwd(num int) string {
 		res[i] = seedStr[seq]
 	}
 	return string(res)
+}
+
+// TimeAfterMinutes check time after
+func TimeAfterMinutes(timeObj time.Time, mins int) bool {
+	timeNow := time.Now()
+	minsStr := fmt.Sprintf("%sm", strconv.Itoa(mins))
+	minDuration, _ := time.ParseDuration(minsStr)
+	timDelay := timeObj.Add(minDuration)
+	ret := timeNow.After(timDelay)
+	if ret {
+		glog.Infof("Time after : %+v", ret)
+	}
+	return ret
 }

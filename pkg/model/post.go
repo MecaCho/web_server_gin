@@ -9,7 +9,8 @@ type Post struct {
 	Author   string `json:"author" gorm:"size:32;not null" binding:"lt=32"`
 	Category string `json:"category" gorm:"size:32;not null" binding:"required,lt=32"`
 	Read     int64  `json:"read" binding:"max=10,min=0"`
-	Comment  int64  `json:"comment" binding:"max=10,min=0"`
+	// Refer   string
+	Comments []Comment `json:"comments" gorm:"ForeignKey:PostID"`
 }
 
 func (p *Post) TableName() string {

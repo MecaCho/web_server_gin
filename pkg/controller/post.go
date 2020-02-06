@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"net/http"
-	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/model"
 	"web_server_gin/pkg/types"
 )
@@ -20,8 +19,7 @@ func (sh *ServerHandle) ListResourcesController(ctx *gin.Context) {
 	filters := ctx.Request.URL.Query()
 	glog.Infof("query filters :%+v", filters)
 
-	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
-	// num = int64(len(posts))
+	num, posts, err := sh.ORM.ListPosts(filters)
 	glog.Infof("query result num:%d, %d.", num, len(posts))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
@@ -43,9 +41,9 @@ func (sh *ServerHandle) GetResourceController(ctx *gin.Context) {
 	}
 
 	filters["id"] = []string{id}
-	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	num, posts, err := sh.ORM.ListPosts(filters)
 	if err != nil || num == 0 {
-		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, err.Error()))
+		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(http.StatusNotFound, err.Error()))
 		return
 	}
 	ctx.JSON(http.StatusOK, types.RenderPostResp(posts[0]))
