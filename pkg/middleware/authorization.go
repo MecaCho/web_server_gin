@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
-	"web_server_gin/pkg/types"
 	"net/http"
+	"web_server_gin/pkg/types"
 )
 
 func CheckAuthorization(ctx *gin.Context) (err error) {
@@ -18,8 +18,8 @@ func CheckAuthorization(ctx *gin.Context) (err error) {
 	return
 }
 
-func AuthMiddleWare(ctx *gin.Context)  {
-	if err := CheckAuthorization(ctx);err != nil{
+func AuthMiddleWare(ctx *gin.Context) {
+	if err := CheckAuthorization(ctx); err != nil {
 		ctx.JSON(http.StatusUnauthorized, err)
 		ctx.Abort()
 	}

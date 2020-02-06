@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
+	"web_server_gin/pkg/middleware"
 	"web_server_gin/pkg/model"
 	"web_server_gin/pkg/types"
-	"web_server_gin/pkg/middleware"
 )
 
 type ServerHandle struct {
@@ -117,9 +117,10 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	for k, post := range posts {
 		posts[k].Content = PrintContentShortCut(post.Content)
 	}
+	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
-		"data": posts,
+		"data": postsResponse.Posts,
 	})
 }
 
@@ -140,8 +141,9 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(common.NotFound, err.Error()))
 		return
 	}
+	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
-		"posts": posts,
+		"posts": postsResponse.Posts,
 	})
 
 	return
