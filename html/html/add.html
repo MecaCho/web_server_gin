@@ -1,0 +1,31 @@
+{{ define "add.html" }}
+{{template "layout_header" .}}
+
+<div class="content-body">
+    <h3>发表文章</h3>
+    <form action="/posts" method="post" class="comment-form">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="id_title">题目：</label>
+                <input type="text" id="id_title" name="title" required>
+            </div>
+            <div class="col-md-4">
+                <label for="id_author">作者：</label>
+                <input type="email" id="id_author" name="author" required>
+            </div>
+            <div class="col-md-4">
+                <label for="id_category">分类：</label>
+                <input type="text" id="id_category" name="category">
+            </div>
+            <div class="col-md-12">
+                <label for="id_content">正文：</label>
+                <textarea name="content" id="id_content" required></textarea>
+                <button type="submit" class="comment-btn">发表</button>
+            </div>
+        </div>    <!-- row -->
+    </form>
+</div>
+
+{{template "layout_footer" .}}
+
+{{ end }}

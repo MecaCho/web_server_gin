@@ -1,5 +1,19 @@
 var searchvisible = 0;
 
+// $('add_post').on('click', function() {
+//     axios({
+//         method: 'post',
+//         url: '/v1/posts',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         data
+//     }).then(res => {
+//         console.log(res.data)
+//         $('.json-msg').text(`success  ${new Date()}`)
+//     })
+// })
+
 $("#search-menu").click(function(e){ 
     //This stops the page scrolling to the top on a # link.
     e.preventDefault();

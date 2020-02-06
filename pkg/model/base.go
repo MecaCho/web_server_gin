@@ -7,7 +7,7 @@ import (
 // BaseCommonModel base meta data
 type BaseCommonModel struct {
 	ID          int64     `json:"id" gorm:"AUTO_INCREMENT;PRIMARY_KEY;unique;Column:id"`
-	Name        string    `json:"name" gorm:"size:64" binding:"lt=64,nameReg"`
+	Name        string    `json:"name" gorm:"size:64"`
 	Description string    `json:"description" gorm:"size:256;null" binding:"lt=256"`
 	CreatedAt   time.Time `json:"created_at" gorm:"not null" time_format:"2006-01-02"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"null" time_format:"2006-01-02"`

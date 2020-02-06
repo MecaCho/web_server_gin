@@ -2,6 +2,7 @@ package html
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/golang/glog"
 	"net/http"
 	"web_server_gin/pkg/common"
@@ -28,8 +29,49 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 		})
 		v1.GET("/posts/:post_id", server.GetPostController)
 		v1.GET("full-width.html", server.IndexController)
+
+		v1.GET("add.html", func(context *gin.Context) {
+			context.HTML(http.StatusOK, "add.html", "hello, I am qiuwenqi.")
+		})
+		v1.POST("posts", server.CreatePostController)
+		v1.GET("admin.html", func(context *gin.Context) {
+			context.HTML(http.StatusOK, "admin.html", "hello, I am qiuwenqi.")
+		})
 	}
 	return
+}
+func (sh *ServerHandle) CreatePostController(ctx *gin.Context) {
+	var postCreate types.PostCreate
+
+	title := ctx.PostForm("title")
+	content := ctx.PostForm("content")
+	category := ctx.PostForm("category")
+	author := ctx.PostForm("author")
+
+	postCreate.Content = content
+	postCreate.Title = title
+	postCreate.Category = category
+	postCreate.Author = author
+
+	err := binding.Validator.ValidateStruct(postCreate.Post)
+	if err != nil {
+		glog.Errorf("Validate request body error: %s.", err.Error())
+		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
+		return
+	}
+
+	err = sh.ORM.CreateResource(&postCreate.Post)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
+		return
+	}
+	var posts []model.Post
+	posts = append(posts, postCreate.Post)
+	ctx.HTML(http.StatusCreated, "single.html", gin.H{
+		"posts": posts,
+	})
+	return
+
 }
 
 func PrintContentShortCut(content string) string {
