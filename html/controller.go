@@ -143,7 +143,7 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	}
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 	postDetail := postsResponse.Posts[0]
-	glog.Infof("post comment num: %d, post detail: %+v.", len(postDetail.Comments), postsResponse)
+	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
 		"posts":       postsResponse.Posts,
 		"comment_num": postDetail.Comment,
