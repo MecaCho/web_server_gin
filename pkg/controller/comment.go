@@ -11,18 +11,28 @@ import (
 
 // ListPostCommentsController ...
 func (sh *ServerHandle) ListPostCommentsController(ctx *gin.Context) {
+	// filters := ctx.Request.URL.Query()
+	// glog.Infof("query filters :%+v", filters)
 	var posts []model.Post
-	filters := ctx.Request.URL.Query()
-	glog.Infof("query filters :%+v", filters)
+	filters := map[string][]string{}
 
-	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
-	// num = int64(len(posts))
-	glog.Infof("query result num:%d, %d.", num, len(posts))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
+	id, ok := ctx.Params.Get("post_id")
+	if !ok {
+		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, "resource not found"))
 		return
 	}
-	ctx.JSON(http.StatusOK, types.NewPostsResponse(num, posts))
+
+	filters["id"] = []string{id}
+	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	if err != nil || num == 0 {
+		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, err.Error()))
+		return
+	}
+	for k, _ := range posts {
+		sh.ORM.RelodeComment(&posts[k])
+	}
+	ctx.JSON(http.StatusOK, types.RenderPostResp(posts[0]))
+	sh.ORM.UpdatePost(posts[0])
 	return
 }
 

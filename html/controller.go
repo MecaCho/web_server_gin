@@ -109,7 +109,7 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	var posts []model.Post
 	filters := ctx.Request.URL.Query()
 	glog.Infof("query filters :%+v", filters)
-	_, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	_, posts, err := sh.ORM.ListPosts(filters)
 	if err != nil {
 		glog.Errorf("List posts error: %s.", err.Error())
 	}
@@ -136,14 +136,18 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	// }
 
 	filters["id"] = []string{id}
-	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	num, posts, err := sh.ORM.ListPosts(filters)
 	if err != nil || num == 0 {
 		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(common.NotFound, err.Error()))
 		return
 	}
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
+	postDetail := postsResponse.Posts[0]
+	glog.Infof("post comment num: %d, post detail: %+v.", len(postDetail.Comments), postsResponse)
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
-		"posts": postsResponse.Posts,
+		"posts":       postsResponse.Posts,
+		"comment_num": postDetail.Comment,
+		"comments":    postDetail.Comments,
 	})
 
 	posts[0].Read += 1

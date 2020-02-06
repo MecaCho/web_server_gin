@@ -22,6 +22,11 @@ func RouterGroup(dbORM *dao.DB, router *gin.Engine) (err error) {
 		v1.DELETE("/posts/:post_id", server.DeleteResourcesController)
 
 		v1.POST("/posts/:post_id/comments", server.CreatePostCommentController)
+		v1.GET("/posts/:post_id/comments", server.ListPostCommentsController)
+		v1.GET("/posts/:post_id/comments/:comment_id", server.GetPostCommentController)
+		v1.DELETE("/posts/:post_id/comments/:comment_id", server.DeletePostCommentsController)
+		v1.PUT("/posts/:post_id/comments/:comment_id", server.UpdatePostCommentController)
+
 	}
 	return
 }
