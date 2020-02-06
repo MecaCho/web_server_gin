@@ -4,8 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"net/http"
+	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/model"
+	"web_server_gin/pkg/types"
 )
 
 type ServerHandle struct {
@@ -30,6 +32,14 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 	return
 }
 
+func PrintContentShortCut(content string) string {
+	if len(content) > 128 {
+		return content[:128]
+	} else {
+		return content
+	}
+}
+
 func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	var posts []model.Post
 	filters := ctx.Request.URL.Query()
@@ -39,6 +49,10 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		glog.Errorf("List posts error: %s.", err.Error())
 	}
 
+	for k, post := range posts {
+		posts[k].Content = PrintContentShortCut(post.Content)
+	}
+
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"data": posts,
 	})
@@ -46,7 +60,7 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 
 // GetResourceController ...
 func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
-	var post model.Post
+	var posts []model.Post
 	filters := map[string][]string{}
 
 	id, _ := ctx.Params.Get("post_id")
@@ -56,13 +70,11 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	// }
 
 	filters["id"] = []string{id}
-	sh.ORM.FilterTable(filters, &post, dao.DBTableNamePost)
-	// if err != nil || num == 0 {
-	// 	ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, err.Error()))
-	// 	return
-	// }
-	var posts []model.Post
-	posts = append(posts, post)
+	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
+	if err != nil || num == 0 {
+		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(common.NotFound, err.Error()))
+		return
+	}
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
 		"posts": posts,
 	})

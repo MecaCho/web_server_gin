@@ -211,7 +211,7 @@ func (db *DB) FilterTable(filters map[string][]string, modelList interface{}, ta
 	totalCount := num
 
 	glog.Infof("List %s list,%d,%d,%s,filters: %+v, num: %d,count: %d.",
-		tableName, limit, offset, orderValue, filters, num, totalCount)
+		tableName, limit, offset, orderValue, filterMap, num, totalCount)
 
 	if err != nil {
 		return 0, fmt.Errorf("query db error, please check parameters, detail: %s", err.Error())

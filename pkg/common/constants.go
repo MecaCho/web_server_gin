@@ -60,3 +60,8 @@ const (
 const (
 	DBInternalError = iota
 )
+
+// ResourceNotFound not found status code
+const (
+	NotFound = iota + 40000
+)

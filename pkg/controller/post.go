@@ -33,7 +33,7 @@ func (sh *ServerHandle) ListResourcesController(ctx *gin.Context) {
 
 // GetResourceController ...
 func (sh *ServerHandle) GetResourceController(ctx *gin.Context) {
-	var post model.Post
+	var posts []model.Post
 	filters := map[string][]string{}
 
 	id, ok := ctx.Params.Get("post_id")
@@ -43,12 +43,12 @@ func (sh *ServerHandle) GetResourceController(ctx *gin.Context) {
 	}
 
 	filters["id"] = []string{id}
-	num, err := sh.ORM.FilterTable(filters, &post, dao.DBTableNamePost)
+	num, err := sh.ORM.FilterTable(filters, &posts, dao.DBTableNamePost)
 	if err != nil || num == 0 {
 		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(500, err.Error()))
 		return
 	}
-	ctx.JSON(http.StatusOK, types.RenderPostResp(post))
+	ctx.JSON(http.StatusOK, types.RenderPostResp(posts[0]))
 	return
 }
 
