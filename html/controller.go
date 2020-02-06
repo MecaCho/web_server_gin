@@ -31,15 +31,45 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 		v1.GET("full-width.html", server.IndexController)
 
 		v1.GET("add.html", func(context *gin.Context) {
+			if err := CheckAuthorization(context); err != nil {
+				context.JSON(http.StatusUnauthorized, err)
+				return
+			}
 			context.HTML(http.StatusOK, "add.html", "hello, I am qiuwenqi.")
 		})
 		v1.POST("posts", server.CreatePostController)
-		v1.GET("admin.html", func(context *gin.Context) {
-			context.HTML(http.StatusOK, "admin.html", "hello, I am qiuwenqi.")
+	}
+
+	admin := router.Group("/admin")
+	{
+		admin.GET("login", func(context *gin.Context) {
+			context.HTML(http.StatusOK, "login.html", "")
 		})
+		admin.POST("login", server.LoginController)
 	}
 	return
 }
+
+func CheckAuthorization(ctx *gin.Context) (err error) {
+	user := ctx.PostForm("username")
+	password := ctx.PostForm("password")
+
+	glog.Infof("request body: %s, %s.", user, password, ctx.Request.Body)
+	if user != "qwq" || password != "qwq" {
+		return types.NewErrorResponse(500, "unauthorized")
+	}
+	return
+}
+
+func (sh *ServerHandle) LoginController(ctx *gin.Context) {
+	if err := CheckAuthorization(ctx); err != nil {
+		ctx.JSON(http.StatusUnauthorized, err)
+		return
+	}
+	ctx.HTML(http.StatusCreated, "add.html", gin.H{})
+	return
+}
+
 func (sh *ServerHandle) CreatePostController(ctx *gin.Context) {
 	var postCreate types.PostCreate
 

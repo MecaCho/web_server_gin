@@ -1,3 +1,6 @@
 package model
 
-const DBTableNamePost = "post"
+const (
+	DBTableNamePost = "post"
+	DBTableNameUser = "user"
+)
