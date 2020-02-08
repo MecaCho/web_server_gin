@@ -4,8 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/golang/glog"
+	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/middleware"
@@ -128,13 +130,14 @@ func (sh *ServerHandle) CreatePostCommentController(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
 		return
 	}
-	ctx.Redirect("","")
 	return
 }
 
 func PrintContentShortCut(content string) string {
 	if len(content) > 128 {
-		return content[:128]
+		lines := strings.Split(content, "\n")
+		glog.Infof("get content first line: %s.", lines[0])
+		return lines[0]
 	} else {
 		return content
 	}
@@ -159,6 +162,10 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	})
 }
 
+type PostRender struct {
+	ContentRender template.HTML `json:"content_render"`
+}
+
 // GetResourceController ...
 func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	var posts []model.Post
@@ -178,12 +185,28 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	}
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 	postDetail := postsResponse.Posts[0]
+	var postRender PostRender
+	postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\n"), "<br />"))
+	// for k, post := range postsResponse.Posts {
+	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
+	// 	content := post.Content
+	// 	postRender = template.HTML(strings.Join(strings.Split(content, "\n"), "<br />")
+	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
+	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
+	// }
 	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
-		"posts":       postsResponse.Posts,
-		"comment_num": postDetail.Comment,
-		"comments":    postDetail.Comments,
-		"post_id":     postDetail.ID,
+		"posts":          postsResponse.Posts,
+		"comment_num":    postDetail.Comment,
+		"comments":       postDetail.Comments,
+		"content_render": postRender.ContentRender,
+		"post_id":        postDetail.ID,
+		"title":          postDetail.Title,
+		"read":           postDetail.Read,
+		"comment":        postDetail.Comment,
+		"category":       postDetail.Category,
+		"author":         postDetail.Author,
+		"created_at":     postDetail.CreatedAt,
 	})
 
 	posts[0].Read += 1

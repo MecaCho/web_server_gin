@@ -64,25 +64,23 @@
     <div class="container">
         <div class="row">
             <main class="col-md-8">
-                {{range .posts}}
-                <article class="post post-{{.ID}}">
+                <article class="post post-{{.post_id}}">
                     <header class="entry-header">
-                        <h1 class="entry-title">{{.Title}}</h1>
+                        <h1 class="entry-title">{{.title}}</h1>
                         <div class="entry-meta">
-                            <span class="post-category"><a href="#">{{.Category}}</a></span>
+                            <span class="post-category"><a href="#">{{.category}}</a></span>
                             <span class="post-date"><a href="#"><time class="entry-date"
-                                                                      datetime="2012-11-09T23:15:57+00:00">{{.CreatedAt}}</time></a></span>
-                            <span class="post-author"><a href="#">{{.Author}}</a></span>
-                            <span class="comments-link"><a href="#">{{.Comment}} 评论</a></span>
-                            <span class="views-count"><a href="#">{{.Read}} 阅读</a></span>
+                                                                      datetime="2012-11-09T23:15:57+00:00">{{.created_at}}</time></a></span>
+                            <span class="post-author"><a href="#">{{.author}}</a></span>
+                            <span class="comments-link"><a href="#">{{.comment}} 评论</a></span>
+                            <span class="views-count"><a href="#">{{.read}} 阅读</a></span>
                         </div>
                     </header>
                     <div class="entry-content clearfix">
-                        <p>
-                        <pre>{{.Content}}</pre></p>
+                        {{/*<p><pre>{{.Content}}</pre></p>*/}}
+                        <p>{{.content_render}}</p>
                     </div>
                 </article>
-                        {{end}}
                 <section class="comment-area" id="comment-area">
                     <hr>
                     <h3>发表评论</h3>
