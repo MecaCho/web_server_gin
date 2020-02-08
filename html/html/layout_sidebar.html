@@ -27,27 +27,22 @@
     <div class="widget widget-category">
         <h3 class="widget-title">分类</h3>
         <ul>
+            {{range .categorys}}
             <li>
-                <a href="#">教育学 <span class="post-count">(13)</span></a>
+                <a href="#">{{.Name}} <span class="post-count">({{.Count}})</span></a>
             </li>
-            <li>
-                <a href="#">经济学 <span class="post-count">(11)</span></a>
-            </li>
-            <li>
-                <a href="#">旅行 <span class="post-count">(8)</span></a>
-            </li>
+                    {{end}}
         </ul>
     </div>
 
     <div class="widget widget-tag-cloud">
         <h3 class="widget-title">标签云</h3>
         <ul>
+            {{range .tags}}
             <li>
-                <a href="#">读书笔记</a>
+                <a href="#">{{.Name}}</a>
             </li>
-            <li>
-                <a href="#">文档</a>
-            </li>
+                {{end}}
         </ul>
     </div>
     <div class="rss">

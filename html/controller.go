@@ -152,18 +152,50 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		glog.Errorf("List posts error: %s.", err.Error())
 	}
 
+	var categorys []Category
+	categroyMap := make(map[string]int64)
+	tagMap := make(map[string]int64)
+	var tags []Tag
+
 	for k, post := range posts {
 		posts[k].Content = PrintContentShortCut(post.Content)
+		categoryKey := post.Category
+		if _, ok := categroyMap[categoryKey]; ok {
+			categroyMap[categoryKey] += 1
+		} else {
+			categroyMap[categoryKey] = 1
+		}
+		tagName := post.Title
+		if _, ok := tagMap[tagName]; ok {
+			tagMap[tagName] += 1
+		} else {
+			tagMap[tagName] = 1
+		}
+	}
+	for k, value := range categroyMap {
+		categorys = append(categorys, Category{k, value})
+	}
+	for k, _ := range tagMap {
+		tags = append(tags, Tag{k})
 	}
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
-		"data": postsResponse.Posts,
+		"data":      postsResponse.Posts,
+		"categorys": categorys,
+		"tags":      tags,
 	})
 }
 
 type PostRender struct {
 	ContentRender template.HTML `json:"content_render"`
+}
+type Category struct {
+	Name  string `json:"name"`
+	Count int64  `json:"count"`
+}
+type Tag struct {
+	Name string `json:"name"`
 }
 
 // GetResourceController ...
@@ -194,6 +226,9 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
 	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
 	// }
+	var categorys []Category
+	var tags []Tag
+
 	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
 		"posts":          postsResponse.Posts,
@@ -207,6 +242,8 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		"category":       postDetail.Category,
 		"author":         postDetail.Author,
 		"created_at":     postDetail.CreatedAt,
+		"categorys":      categorys,
+		"tags":           tags,
 	})
 
 	posts[0].Read += 1
