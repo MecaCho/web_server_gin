@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/golang/glog"
 	"net/http"
+	"strconv"
 	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/middleware"
@@ -29,6 +30,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 			context.HTML(http.StatusOK, "about.html", "hello, I am qiuwenqi.")
 		})
 		v1.GET("/posts/:post_id", server.GetPostController)
+		v1.POST("/posts/:post_id/comments", server.CreatePostCommentController)
 		v1.GET("full-width.html", server.IndexController)
 
 		v1.GET("add.html", func(context *gin.Context) {
@@ -94,7 +96,40 @@ func (sh *ServerHandle) CreatePostController(ctx *gin.Context) {
 		"posts": posts,
 	})
 	return
+}
 
+func (sh *ServerHandle) CreatePostCommentController(ctx *gin.Context) {
+	var comment model.Comment
+
+	postID, _ := ctx.Params.Get("post_id")
+	// filters := make(map[string][]string)
+	// _, posts, _ := sh.ORM.ListPosts(filters)
+	// post := posts[0].ID
+
+	user_name := ctx.PostForm("user_name")
+	content := ctx.PostForm("content")
+	email := ctx.PostForm("email")
+
+	comment.UserName = user_name
+	comment.Content = content
+	comment.Email = email
+	postIDInt, _ := strconv.Atoi(postID)
+	comment.PostID = int64(postIDInt)
+
+	err := binding.Validator.ValidateStruct(comment)
+	if err != nil {
+		glog.Errorf("Validate request body error: %s.", err.Error())
+		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
+		return
+	}
+
+	err = sh.ORM.CreateResource(&comment)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
+		return
+	}
+	ctx.Redirect("","")
+	return
 }
 
 func PrintContentShortCut(content string) string {
@@ -148,6 +183,7 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		"posts":       postsResponse.Posts,
 		"comment_num": postDetail.Comment,
 		"comments":    postDetail.Comments,
+		"post_id":     postDetail.ID,
 	})
 
 	posts[0].Read += 1
