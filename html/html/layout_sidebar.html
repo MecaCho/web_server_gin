@@ -4,22 +4,21 @@
     <div class="widget widget-recent-posts">
         <h3 class="widget-title">最新文章</h3>
         <ul>
+            {{range .newest_posts}}
             <li>
-                <a href="#">《教育学的一些研究》：前言</a>
+                <a href="/posts/{{.ID}}">{{.Title}}</a>
             </li>
-            <li>
-                <a href="#">《经济学卷一读后感》：什么是经济学</a>
-            </li>
+                    {{end}}
         </ul>
     </div>
     <div class="widget widget-archives">
         <h3 class="widget-title">归档</h3>
         <ul>
             <li>
-                <a href="#">2019年 </a>
+                <a href="/">2019年 </a>
             </li>
             <li>
-                <a href="#">2020年</a>
+                <a href="/">2020年</a>
             </li>
         </ul>
     </div>
@@ -29,7 +28,7 @@
         <ul>
             {{range .categorys}}
             <li>
-                <a href="#">{{.Name}} <span class="post-count">({{.Count}})</span></a>
+                <a href="/">{{.Name}} <span class="post-count">({{.Count}})</span></a>
             </li>
                     {{end}}
         </ul>
@@ -40,7 +39,7 @@
         <ul>
             {{range .tags}}
             <li>
-                <a href="#">{{.Name}}</a>
+                <a href="/">{{.Name}}</a>
             </li>
                 {{end}}
         </ul>

@@ -157,6 +157,8 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	tagMap := make(map[string]int64)
 	var tags []Tag
 
+	var newestPosts []NewPost
+
 	for k, post := range posts {
 		posts[k].Content = PrintContentShortCut(post.Content)
 		categoryKey := post.Category
@@ -171,7 +173,11 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		} else {
 			tagMap[tagName] = 1
 		}
+		if len(newestPosts) < 7 {
+			newestPosts = append(newestPosts, NewPost{post.ID, post.Title})
+		}
 	}
+
 	for k, value := range categroyMap {
 		categorys = append(categorys, Category{k, value})
 	}
@@ -181,9 +187,10 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
-		"data":      postsResponse.Posts,
-		"categorys": categorys,
-		"tags":      tags,
+		"data":         postsResponse.Posts,
+		"categorys":    categorys,
+		"tags":         tags,
+		"newest_posts": newestPosts,
 	})
 }
 
@@ -196,6 +203,11 @@ type Category struct {
 }
 type Tag struct {
 	Name string `json:"name"`
+}
+
+type NewPost struct {
+	ID    int64  `json:"id"`
+	Title string `json:"title"`
 }
 
 // GetResourceController ...
