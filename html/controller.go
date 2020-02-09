@@ -133,27 +133,17 @@ func (sh *ServerHandle) CreatePostCommentController(ctx *gin.Context) {
 	return
 }
 
-func PrintContentShortCut(content string) string {
-	if len(content) > 128 {
-		lines := strings.Split(content, "\n")
-		glog.Infof("get content first line: %s.", lines[0])
-		return lines[0]
-	} else {
-		return content
-	}
+type PostsRenderResponse struct {
+	PostsResponses types.PostsResponse `json:"posts_responses"`
+	Archives       []Archive           `json:"archives"`
+	Categories     []Category          `json:"category"`
+	Tags           []Tag               `json:"tags"`
+	NewestPosts    []NewPost           `json:"newest_posts"`
 }
 
-func (sh *ServerHandle) IndexController(ctx *gin.Context) {
-	var posts []model.Post
-	filters := ctx.Request.URL.Query()
-	glog.Infof("query filters :%+v", filters)
-	_, posts, err := sh.ORM.ListPosts(filters)
-	if err != nil {
-		glog.Errorf("List posts error: %s.", err.Error())
-	}
-
+func ConvertPostsRender(posts []model.Post) (postsRender PostsRenderResponse) {
 	var categorys []Category
-	var archives []Archives
+	var archives []Archive
 	categroyMap := make(map[string]int64)
 	archivesMap := make(map[string]int64)
 	tagMap := make(map[string]int64)
@@ -192,19 +182,48 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		categorys = append(categorys, Category{k, value})
 	}
 	for k, value := range archivesMap {
-		archives = append(archives, Archives{k, value})
+		archives = append(archives, Archive{k, value})
 	}
 	for k, _ := range tagMap {
 		tags = append(tags, Tag{k})
 	}
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 
+	postsRender.Archives = archives
+	postsRender.Categories = categorys
+	postsRender.Tags = tags
+	postsRender.NewestPosts = newestPosts
+	postsRender.PostsResponses = postsResponse
+	return
+}
+
+func PrintContentShortCut(content string) string {
+	if len(content) > 128 {
+		lines := strings.Split(content, "\n")
+		glog.Infof("get content first line: %s.", lines[0])
+		return lines[0]
+	} else {
+		return content
+	}
+}
+
+func (sh *ServerHandle) IndexController(ctx *gin.Context) {
+	var posts []model.Post
+	filters := ctx.Request.URL.Query()
+	glog.Infof("query filters :%+v", filters)
+	_, posts, err := sh.ORM.ListPosts(filters)
+	if err != nil {
+		glog.Errorf("List posts error: %s.", err.Error())
+	}
+
+	postsRender := ConvertPostsRender(posts)
+
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
-		"data":         postsResponse.Posts,
-		"categorys":    categorys,
-		"tags":         tags,
-		"newest_posts": newestPosts,
-		"archives":     archives,
+		"data":         postsRender.PostsResponses.Posts,
+		"categorys":    postsRender.Categories,
+		"tags":         postsRender.Tags,
+		"newest_posts": postsRender.NewestPosts,
+		"archives":     postsRender.Archives,
 	})
 }
 
@@ -217,7 +236,7 @@ type Category struct {
 	Count int64  `json:"count"`
 }
 
-type Archives struct {
+type Archive struct {
 	Month string `json:"month"`
 	Count int64  `json:"count"`
 }
@@ -259,8 +278,7 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
 	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
 	// }
-	var categorys []Category
-	var tags []Tag
+	postsRender := ConvertPostsRender(posts)
 
 	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
@@ -275,8 +293,10 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		"category":       postDetail.Category,
 		"author":         postDetail.Author,
 		"created_at":     postDetail.CreatedAt,
-		"categorys":      categorys,
-		"tags":           tags,
+		"categorys":      postsRender.Categories,
+		"tags":           postsRender.Tags,
+		"archives":       postsRender.Archives,
+		"newest_posts":   postsRender.NewestPosts,
 	})
 
 	posts[0].Read += 1
