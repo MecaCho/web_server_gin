@@ -142,7 +142,7 @@ type PostsRenderResponse struct {
 	NewestPosts    []NewPost           `json:"newest_posts"`
 }
 
-func ConvertPostsRender(posts []model.Post) (postsRender PostsRenderResponse) {
+func ConvertPostsRender(posts []model.Post, shortCut bool) (postsRender PostsRenderResponse) {
 	var categorys []Category
 	var archives []Archive
 	categroyMap := make(map[string]int64)
@@ -153,7 +153,10 @@ func ConvertPostsRender(posts []model.Post) (postsRender PostsRenderResponse) {
 	var newestPosts []NewPost
 
 	for k, post := range posts {
-		posts[k].Content = PrintContentShortCut(post.Content)
+		glog.Infof("content short cut: %+v.", shortCut)
+		if shortCut {
+			posts[k].Content = PrintContentShortCut(post.Content)
+		}
 		categoryKey := post.Category
 		if _, ok := categroyMap[categoryKey]; ok {
 			categroyMap[categoryKey] += 1
@@ -217,7 +220,7 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		glog.Errorf("List posts error: %s.", err.Error())
 	}
 
-	postsRender := ConvertPostsRender(posts)
+	postsRender := ConvertPostsRender(posts, true)
 	var pages []Page
 	count := postsRender.PostsResponses.Count
 	for i := 0; i <= int(count/21); i++ {
@@ -291,7 +294,7 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
 	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
 	// }
-	postsRender := ConvertPostsRender(posts)
+	postsRender := ConvertPostsRender(posts, false)
 
 	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
@@ -313,6 +316,6 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	})
 
 	posts[0].Read += 1
-	sh.ORM.UpdatePost(posts[0])
+	sh.ORM.UpdatePostColumn(posts[0], "read", strconv.Itoa(int(posts[0].Read)))
 	return
 }

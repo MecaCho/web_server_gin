@@ -13,6 +13,15 @@ func (db *DB) UpdatePost(post model.Post) (err error) {
 	return
 }
 
+func (db *DB) UpdatePostColumn(post model.Post, columnName, value string) (err error) {
+	err = db.ORM.Model(post).UpdateColumn(columnName, value).Error
+	if err != nil {
+		glog.Errorf("update resource error: %s.", err.Error())
+	}
+	return
+
+}
+
 func (db *DB) ListPosts(filters map[string][]string) (num int64, posts []model.Post, err error) {
 	num, err = db.FilterTable(filters, &posts, DBTableNamePost)
 	if err == nil {
