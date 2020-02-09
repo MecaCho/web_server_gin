@@ -154,7 +154,7 @@ func ConvertPostsRender(posts []model.Post, shortCut bool) (postsRender PostsRen
 
 	for k, post := range posts {
 		glog.Infof("content short cut: %+v.", shortCut)
-		if shortCut {
+		if shortCut == true {
 			posts[k].Content = PrintContentShortCut(post.Content)
 		}
 		categoryKey := post.Category
@@ -204,6 +204,12 @@ func ConvertPostsRender(posts []model.Post, shortCut bool) (postsRender PostsRen
 func PrintContentShortCut(content string) string {
 	if len(content) > 128 {
 		lines := strings.Split(content, "\n")
+		if len(lines[0]) > 128 {
+			lines := strings.Split(content, "\r")
+			if len(lines[0]) > 128 {
+				lines[0] = lines[0][:128]
+			}
+		}
 		glog.Infof("get content first line: %s.", lines[0])
 		return lines[0]
 	} else {
@@ -286,7 +292,12 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
 	postDetail := postsResponse.Posts[0]
 	var postRender PostRender
-	postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\n"), "<br />"))
+	switch {
+	case strings.Contains(postDetail.Content, "\n"):
+		postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\n"), "<br />"))
+	case strings.Contains(postDetail.Content, "\r"):
+		postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\r"), "<br />"))
+	}
 	// for k, post := range postsResponse.Posts {
 	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
 	// 	content := post.Content
