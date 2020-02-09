@@ -14,12 +14,11 @@
     <div class="widget widget-archives">
         <h3 class="widget-title">归档</h3>
         <ul>
+            {{range .archives}}
             <li>
-                <a href="/">2019年 </a>
+                <a href="/">{{.Month}} <span class="post-count">({{.Count}})</span></a>
             </li>
-            <li>
-                <a href="/">2020年</a>
-            </li>
+                    {{end}}
         </ul>
     </div>
 

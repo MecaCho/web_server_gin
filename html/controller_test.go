@@ -3,6 +3,7 @@ package html
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestServerHandle_IndexController(t *testing.T) {
@@ -13,4 +14,10 @@ func TestServerHandle_IndexController(t *testing.T) {
 	} else {
 		fmt.Println(testStr)
 	}
+}
+
+func TestServerHandle_IndexController2(t *testing.T) {
+	now := time.Now()
+	nowStr := now.Format("2006-01")
+	fmt.Println(nowStr)
 }

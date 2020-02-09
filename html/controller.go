@@ -153,7 +153,9 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	}
 
 	var categorys []Category
+	var archives []Archives
 	categroyMap := make(map[string]int64)
+	archivesMap := make(map[string]int64)
 	tagMap := make(map[string]int64)
 	var tags []Tag
 
@@ -167,6 +169,14 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		} else {
 			categroyMap[categoryKey] = 1
 		}
+
+		archivesKey := post.CreatedAt.Format("2006-01")
+		if _, ok := archivesMap[archivesKey]; ok {
+			archivesMap[archivesKey] += 1
+		} else {
+			archivesMap[archivesKey] = 1
+		}
+
 		tagName := post.Title
 		if _, ok := tagMap[tagName]; ok {
 			tagMap[tagName] += 1
@@ -181,6 +191,9 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	for k, value := range categroyMap {
 		categorys = append(categorys, Category{k, value})
 	}
+	for k, value := range archivesMap {
+		archives = append(archives, Archives{k, value})
+	}
 	for k, _ := range tagMap {
 		tags = append(tags, Tag{k})
 	}
@@ -191,16 +204,24 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 		"categorys":    categorys,
 		"tags":         tags,
 		"newest_posts": newestPosts,
+		"archives":     archives,
 	})
 }
 
 type PostRender struct {
 	ContentRender template.HTML `json:"content_render"`
 }
+
 type Category struct {
 	Name  string `json:"name"`
 	Count int64  `json:"count"`
 }
+
+type Archives struct {
+	Month string `json:"month"`
+	Count int64  `json:"count"`
+}
+
 type Tag struct {
 	Name string `json:"name"`
 }
