@@ -42,6 +42,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 			}
 			context.HTML(http.StatusOK, "add.html", "hello, I am qiuwenqi.")
 		})
+		v1.GET("posts", server.IndexController)
 		v1.POST("posts", server.CreatePostController)
 	}
 
@@ -217,14 +218,26 @@ func (sh *ServerHandle) IndexController(ctx *gin.Context) {
 	}
 
 	postsRender := ConvertPostsRender(posts)
+	var pages []Page
+	count := postsRender.PostsResponses.Count
+	for i := 0; i <= int(count/21); i++ {
+		pages = append(pages, Page{i + 1, i * 20})
+	}
 
 	ctx.HTML(http.StatusOK, "index.html", gin.H{
 		"data":         postsRender.PostsResponses.Posts,
+		"count":        postsRender.PostsResponses.Count,
 		"categorys":    postsRender.Categories,
 		"tags":         postsRender.Tags,
 		"newest_posts": postsRender.NewestPosts,
 		"archives":     postsRender.Archives,
+		"pages":        pages,
 	})
+}
+
+type Page struct {
+	PageNum int `json:"page_num"`
+	Offset  int `json:"offset"`
 }
 
 type PostRender struct {
