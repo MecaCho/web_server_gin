@@ -203,14 +203,14 @@ func ConvertPostsRender(posts []model.Post, shortCut bool) (postsRender PostsRen
 
 func PrintContentShortCut(content string) string {
 	if len(content) > 128 {
-		lines := strings.Split(content, "\n")
-		if len(lines[0]) > 128 {
-			lines := strings.Split(content, "\r")
-			if len(lines[0]) > 128 {
-				lines[0] = lines[0][:128]
-			}
+		lines := strings.Split(content, "\r")
+		if strings.Contains(content, "\n"){
+			lines = strings.Split(content, "\n")
 		}
-		glog.Infof("get content first line: %s.", lines[0])
+		glog.Infof("get content first line: %+v.", len(lines[0]))
+		if len(lines[0]) > 128{
+			return lines[0][:128]
+		}
 		return lines[0]
 	} else {
 		return content
