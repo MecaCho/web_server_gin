@@ -32,7 +32,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 			context.HTML(http.StatusOK, "about.html", "hello, I am qiuwenqi.")
 		})
 		v1.GET("/posts/:post_id", server.GetPostController)
-		v1.POST("/posts/:post_id/comments", server.CreatePostCommentController)
+		v1.POST("/posts/:post_id", server.CreatePostCommentController)
 		v1.GET("full-width.html", server.IndexController)
 
 		v1.GET("add.html", func(context *gin.Context) {
@@ -131,6 +131,28 @@ func (sh *ServerHandle) CreatePostCommentController(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
 		return
 	}
+
+	postDetail, contentRender, postsRender, err := sh.GetPostDetail(postID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
+		return
+	}
+	ctx.HTML(http.StatusOK, "single.html", gin.H{
+		"comment_num":    postDetail.Comment,
+		"comments":       postDetail.Comments,
+		"content_render": contentRender.ContentRender,
+		"post_id":        postDetail.ID,
+		"title":          postDetail.Title,
+		"read":           postDetail.Read,
+		"comment":        postDetail.Comment,
+		"category":       postDetail.Category,
+		"author":         postDetail.Author,
+		"created_at":     postDetail.CreatedAt,
+		"categorys":      postsRender.Categories,
+		"tags":           postsRender.Tags,
+		"archives":       postsRender.Archives,
+		"newest_posts":   postsRender.NewestPosts,
+	})
 	return
 }
 
@@ -204,11 +226,11 @@ func ConvertPostsRender(posts []model.Post, shortCut bool) (postsRender PostsRen
 func PrintContentShortCut(content string) string {
 	if len(content) > 128 {
 		lines := strings.Split(content, "\r")
-		if strings.Contains(content, "\n"){
+		if strings.Contains(content, "\n") {
 			lines = strings.Split(content, "\n")
 		}
 		glog.Infof("get content first line: %+v.", len(lines[0]))
-		if len(lines[0]) > 128{
+		if len(lines[0]) > 128 {
 			return lines[0][:128]
 		}
 		return lines[0]
@@ -272,6 +294,36 @@ type NewPost struct {
 	Title string `json:"title"`
 }
 
+func (sh *ServerHandle) GetPostDetail(id string) (postDetail types.PostResponse, contentRender PostRender, postsRender PostsRenderResponse, err error) {
+	filters := map[string][]string{}
+	filters["id"] = []string{id}
+	num, posts, err := sh.ORM.ListPosts(filters)
+	if err != nil || num == 0 {
+		err = types.NewErrorResponse(common.NotFound, err.Error())
+		return
+	}
+	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
+	postDetail = postsResponse.Posts[0]
+	// var postRender PostRender
+	switch {
+	case strings.Contains(postDetail.Content, "\n"):
+		contentRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\n"), "<br />"))
+	case strings.Contains(postDetail.Content, "\r"):
+		contentRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\r"), "<br />"))
+	default:
+		contentRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\t"), "<br />"))
+	}
+	// for k, post := range postsResponse.Posts {
+	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
+	// 	content := post.Content
+	// 	postRender = template.HTML(strings.Join(strings.Split(content, "\n"), "<br />")
+	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
+	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
+	// }
+	postsRender = ConvertPostsRender(posts, false)
+	return
+}
+
 // GetResourceController ...
 func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 	var posts []model.Post
@@ -289,30 +341,17 @@ func (sh *ServerHandle) GetPostController(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, types.NewErrorResponse(common.NotFound, err.Error()))
 		return
 	}
-	postsResponse := types.NewPostsResponse(int64(len(posts)), posts)
-	postDetail := postsResponse.Posts[0]
-	var postRender PostRender
-	switch {
-	case strings.Contains(postDetail.Content, "\n"):
-		postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\n"), "<br />"))
-	case strings.Contains(postDetail.Content, "\r"):
-		postRender.ContentRender = template.HTML(strings.Join(strings.Split(postDetail.Content, "\r"), "<br />"))
+	postDetail, contentRender, postsRender, err := sh.GetPostDetail(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, types.NewErrorResponse(500, err.Error()))
+		return
 	}
-	// for k, post := range postsResponse.Posts {
-	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
-	// 	content := post.Content
-	// 	postRender = template.HTML(strings.Join(strings.Split(content, "\n"), "<br />")
-	// 	// postsResponse.Posts[k].Content = strings.ReplaceAll(post.Content, "\n", "<br/>")
-	// 	glog.Infof("Post content: %s.", postsResponse.Posts[k].Content)
-	// }
-	postsRender := ConvertPostsRender(posts, false)
 
 	glog.Infof("post comment num: %d.", len(postDetail.Comments))
 	ctx.HTML(http.StatusOK, "single.html", gin.H{
-		"posts":          postsResponse.Posts,
 		"comment_num":    postDetail.Comment,
 		"comments":       postDetail.Comments,
-		"content_render": postRender.ContentRender,
+		"content_render": contentRender.ContentRender,
 		"post_id":        postDetail.ID,
 		"title":          postDetail.Title,
 		"read":           postDetail.Read,

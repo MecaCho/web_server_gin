@@ -84,7 +84,7 @@
                 <section class="comment-area" id="comment-area">
                     <hr>
                     <h3>发表评论</h3>
-                    <form action="/posts/{{.post_id}}/comments" method="post" class="comment-form">
+                    <form action="/posts/{{.post_id}}" method="post" class="comment-form" name="myForm">
                         <div class="row">
                             <div class="col-md-4">
                                 <label for="id_user_name">名字：</label>
@@ -123,6 +123,16 @@
         </div>
     </div>
 </div>
+
+{{/*var formData = JSON.stringify($("#myForm").serializeArray());*/}}
+{{/*$.ajax({*/}}
+{{/*type: "POST",*/}}
+{{/*url: "/posts/1/comments",*/}}
+{{/*data: formData,*/}}
+{{/*success: function(){},*/}}
+{{/*dataType: "json",*/}}
+{{/*contentType : "application/json"*/}}
+{{/*});*/}}
 
 <!-- Mobile Menu -->
 <div class="overlay overlay-hugeinc">
