@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"net/http"
+	"time"
 	"web_server_gin/pkg/model"
 	"web_server_gin/pkg/types"
 )
@@ -69,6 +70,12 @@ func (sh *ServerHandle) CreateResourceController(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, types.NewErrorResponse(400, err.Error()))
 		return
 	}
+	tag := postCreate.Tag
+	title := postCreate.Title
+	if tag == "" {
+		postCreate.Tag = title[:4]
+	}
+	postCreate.Archive = time.Now().Format("2006-01")
 	// err := binding.Validator.ValidateStruct(postCreate.Post)
 	// if err != nil {
 	// 	glog.Errorf("Validate request body error: %s.", err.Error())

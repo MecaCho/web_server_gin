@@ -16,7 +16,7 @@
         <ul>
             {{range .archives}}
             <li>
-                <a href="/">{{.Month}} <span class="post-count">({{.Count}})</span></a>
+                <a href="/posts?archive={{.Month}}">{{.Month}} <span class="post-count">({{.Count}})</span></a>
             </li>
                     {{end}}
         </ul>
@@ -27,7 +27,7 @@
         <ul>
             {{range .categorys}}
             <li>
-                <a href="/">{{.Name}} <span class="post-count">({{.Count}})</span></a>
+                <a href="/posts?category={{.Name}}">{{.Name}} <span class="post-count">({{.Count}})</span></a>
             </li>
                     {{end}}
         </ul>
@@ -38,7 +38,7 @@
         <ul>
             {{range .tags}}
             <li>
-                <a href="/">{{.Name}}</a>
+                <a href="/posts?tag={{.Name}}">{{.Name}}</a>
             </li>
                 {{end}}
         </ul>

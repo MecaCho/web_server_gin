@@ -6,6 +6,9 @@ import (
 )
 
 func (db *DB) UpdatePost(post model.Post) (err error) {
+	if post.Archive == "" {
+		post.Archive = post.CreatedAt.Format("2006-01")
+	}
 	err = db.ORM.Model(post).Updates(post).Error
 	if err != nil {
 		glog.Errorf("update resource error: %s.", err.Error())
@@ -17,6 +20,10 @@ func (db *DB) UpdatePostColumn(post model.Post, columnName, value string) (err e
 	err = db.ORM.Model(post).UpdateColumn(columnName, value).Error
 	if err != nil {
 		glog.Errorf("update resource error: %s.", err.Error())
+	}
+	if post.Archive == "" {
+		post.Archive = post.CreatedAt.Format("2006-01")
+		db.ORM.Model(post).UpdateColumn("archive", post.Archive)
 	}
 	return
 

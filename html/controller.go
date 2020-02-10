@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"web_server_gin/pkg/common"
 	"web_server_gin/pkg/dao"
 	"web_server_gin/pkg/middleware"
@@ -75,11 +76,16 @@ func (sh *ServerHandle) CreatePostController(ctx *gin.Context) {
 	content := ctx.PostForm("content")
 	category := ctx.PostForm("category")
 	author := ctx.PostForm("author")
+	tag := ctx.PostForm("tag")
 
 	postCreate.Content = content
 	postCreate.Title = title
 	postCreate.Category = category
 	postCreate.Author = author
+	if tag == "" {
+		postCreate.Tag = title[:4]
+	}
+	postCreate.Archive = time.Now().Format("2006-01")
 
 	err := binding.Validator.ValidateStruct(postCreate.Post)
 	if err != nil {
