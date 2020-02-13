@@ -29,9 +29,7 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 		v1.GET("contact.html", func(context *gin.Context) {
 			context.HTML(http.StatusOK, "contact.html", "hello, I am qiuwenqi.")
 		})
-		v1.GET("about.html", func(context *gin.Context) {
-			context.HTML(http.StatusOK, "about.html", "hello, I am qiuwenqi.")
-		})
+		v1.GET("about.html", server.GetPersonalInfoController)
 		v1.GET("/posts/:post_id", server.GetPostController)
 		v1.POST("/posts/:post_id", server.CreatePostCommentController)
 		v1.GET("full-width.html", server.IndexController)
@@ -58,6 +56,25 @@ func HTMLRouter(dbORM *dao.DB, router *gin.Engine) (err error) {
 		admin.POST("login", server.LoginController)
 	}
 	return
+}
+
+func (sh *ServerHandle) GetPersonalInfoController(ctx *gin.Context) {
+	var info model.PersonaInfo
+	_, info, err := sh.ORM.GetPersonalInfo(nil)
+	if err != nil{
+		glog.Errorf("Get personal info error: %s.", err.Error())
+	}
+	// glog.Infof("get personal info: %+v.", info)
+
+	ctx.HTML(http.StatusOK, "about.html", gin.H{
+		"introduction": info.Introduction,
+		"facebook":     info.Facebook,
+		"twitter":      info.Twitter,
+		"zhihu":        info.Zhihu,
+		"weibo":        info.Weibo,
+		"wechat":       info.Wechat,
+	})
+
 }
 
 func (sh *ServerHandle) LoginController(ctx *gin.Context) {

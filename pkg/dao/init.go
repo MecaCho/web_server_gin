@@ -10,7 +10,7 @@ func InitDB(dbCon string) (dbORM *DB, err error) {
 	if err != nil {
 		return
 	}
-	db.AutoMigrate(&model.Post{}, &model.Comment{})
+	db.AutoMigrate(&model.Post{}, &model.Comment{}, &model.PersonaInfo{})
 	dbORM = &DB{*db, true}
 	return
 }

@@ -15,6 +15,12 @@ type BaseCommonModel struct {
 	Modifier    string    `json:"modifier" gorm:"size:32;null" binding:"lt=32"`
 }
 
+// BaseTagModel base meta data
+type BaseTagModel struct {
+	ID        int64     `json:"id" gorm:"AUTO_INCREMENT;PRIMARY_KEY;unique;Column:id"`
+	CreatedAt time.Time `json:"created_at" gorm:"not null" time_format:"2006-01-02"`
+}
+
 // type User struct {
 // 	gorm.Model
 // 	Name         string
